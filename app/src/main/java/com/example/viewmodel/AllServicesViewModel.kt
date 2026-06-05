@@ -62,6 +62,36 @@ class AllServicesViewModel(application: Application) : AndroidViewModel(applicat
     val previousRequests: StateFlow<List<PreviousServiceRequest>> = repository.previousRequests
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    val supervisors: StateFlow<List<Supervisor>> = repository.allSupervisors
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    // --- Dynamic Authentication State ---
+    private val _currentUserRole = MutableStateFlow<String>("GUEST") // GUEST, OWNER, SUPERVISOR
+    val currentUserRole: StateFlow<String> = _currentUserRole.asStateFlow()
+
+    private val _currentSupervisorPermissions = MutableStateFlow<Supervisor?>(null)
+    val currentSupervisorPermissions: StateFlow<Supervisor?> = _currentSupervisorPermissions.asStateFlow()
+
+    fun login(usernameInput: String, passwordInput: String): Boolean {
+        if (usernameInput == "WAM2026" && passwordInput == "maher--736462") {
+            _currentUserRole.value = "OWNER"
+            _currentSupervisorPermissions.value = null
+            return true
+        }
+        val s = supervisors.value.firstOrNull { s -> s.username == usernameInput && s.password == passwordInput }
+        if (s != null) {
+            _currentUserRole.value = "SUPERVISOR"
+            _currentSupervisorPermissions.value = s
+            return true
+        }
+        return false
+    }
+
+    fun logout() {
+        _currentUserRole.value = "GUEST"
+        _currentSupervisorPermissions.value = null
+    }
+
     // --- Search & Filter States ---
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
@@ -411,6 +441,80 @@ class AllServicesViewModel(application: Application) : AndroidViewModel(applicat
         viewModelScope.launch(Dispatchers.IO) {
             repository.deleteCategory(category)
             repository.logActivity("المالك", "تم حذف قسم: ${category.nameAr}")
+        }
+    }
+
+    fun updateCategory(category: Category, nameAr: String, nameEn: String, imageUrl: String, parentId: Int? = null) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val updated = category.copy(nameAr = nameAr, nameEn = nameEn, imageUrl = imageUrl, parentId = parentId)
+            repository.updateCategory(updated)
+            repository.logActivity("المالك", "تم تعديل بيانات قسم: ${category.nameAr} إلى $nameAr")
+        }
+    }
+
+    // --- Supervisors CRUD Operations ---
+    fun createSupervisor(usernameInput: String, nameInput: String, passwordInput: String, canAcceptReject: Boolean, canManageCat: Boolean, canManageProv: Boolean, canViewRep: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val supervisor = Supervisor(
+                username = usernameInput,
+                name = nameInput,
+                password = passwordInput,
+                canAcceptRejectRequests = canAcceptReject,
+                canManageCategories = canManageCat,
+                canManageProviders = canManageProv,
+                canViewReports = canViewRep
+            )
+            repository.insertSupervisor(supervisor)
+            repository.logActivity("المالك", "تمت إضافة مشرف جديد: $nameInput")
+        }
+    }
+
+    fun updateSupervisor(supervisor: Supervisor) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateSupervisor(supervisor)
+            repository.logActivity("المالك", "تم تعديل صلاحيات أو كلمة مرور المشرف: ${supervisor.name}")
+        }
+    }
+
+    fun deleteSupervisor(supervisor: Supervisor) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.deleteSupervisor(supervisor)
+            repository.logActivity("المالك", "تم حذف المشرف: ${supervisor.name}")
+        }
+    }
+
+    // --- Custom Welcome Customization Options ---
+    fun updateWelcomeImage(imageUri: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val current = appConfig.value
+            val updated = current.copy(welcomeImageUri = imageUri)
+            repository.updateAppConfig(updated)
+            repository.logActivity("المالك", "تم تعيين صورة ترحيبية مخصصة بدلاً عن الرسالة النصية.")
+        }
+    }
+
+    fun clearWelcomeImage() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val current = appConfig.value
+            val updated = current.copy(welcomeImageUri = "")
+            repository.updateAppConfig(updated)
+            repository.logActivity("المالك", "تم إرجاع الرسالة الترحيبية النصية")
+        }
+    }
+
+    fun updateWelcomeFontSize(sizeSp: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val current = appConfig.value
+            val updated = current.copy(welcomeMessageFontSize = sizeSp)
+            repository.updateAppConfig(updated)
+        }
+    }
+
+    fun updateWelcomeAlignment(alignment: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val current = appConfig.value
+            val updated = current.copy(welcomeMessageAlignment = alignment)
+            repository.updateAppConfig(updated)
         }
     }
 

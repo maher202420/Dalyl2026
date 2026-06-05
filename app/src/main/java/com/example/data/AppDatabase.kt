@@ -161,6 +161,19 @@ interface AppDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPreviousRequest(request: PreviousServiceRequest)
+
+    // --- Supervisors ---
+    @Query("SELECT * FROM supervisors ORDER BY id DESC")
+    fun getAllSupervisorsFlow(): Flow<List<Supervisor>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertSupervisor(supervisor: Supervisor)
+
+    @Update
+    suspend fun updateSupervisor(supervisor: Supervisor)
+
+    @Delete
+    suspend fun deleteSupervisor(supervisor: Supervisor)
 }
 
 @Database(
@@ -175,9 +188,10 @@ interface AppDao {
         Message::class,
         DeviceWhitelist::class,
         City::class,
-        PreviousServiceRequest::class
+        PreviousServiceRequest::class,
+        Supervisor::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

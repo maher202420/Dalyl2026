@@ -16,10 +16,13 @@ data class AppConfig(
     val launcherIcon: String = "default",
     val promotionalFooter: String = "MAW 777644670",
     val welcomeMessage: String = "مرحباً بك في تطبيق كل الخدمات. متاحون لخدمتك على مدار الساعة!",
+    val welcomeImageUri: String = "",
+    val welcomeMessageFontSize: Int = 12,
+    val welcomeMessageAlignment: String = "START", // START, CENTER, END
     val supportPhone: String = "777644670",
     val supportEmail: String = "support@servicesmaw.com",
     val supportWhatsApp: String = "777644670",
-    val adminPassword: String = "maher736462",
+    val adminPassword: String = "maher--736462",
     val isMaintenanceMode: Boolean = false,
     val maintenanceMessage: String = "التطبيق في وضع الصيانة حالياً للتحديث لتوفير أفضل تجربة لكم.",
     val isTwoFactorEnabled: Boolean = false,
@@ -160,3 +163,16 @@ data class PreviousServiceRequest(
     val status: String = "CONTACTED", // CONTACTED, COMPLETED, CANCELLED
     val timestamp: Long = System.currentTimeMillis()
 )
+
+@Entity(tableName = "supervisors")
+data class Supervisor(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val username: String,
+    val name: String,
+    val password: String,
+    val canAcceptRejectRequests: Boolean = true,
+    val canManageCategories: Boolean = false,
+    val canManageProviders: Boolean = false,
+    val canViewReports: Boolean = true
+)
+

@@ -162,4 +162,20 @@ class AppRepository(private val dao: AppDao) {
     suspend fun insertPreviousRequest(request: PreviousServiceRequest) {
         dao.insertPreviousRequest(request)
     }
+
+    // --- Supervisors ---
+    val allSupervisors: Flow<List<Supervisor>> = dao.getAllSupervisorsFlow()
+
+    suspend fun insertSupervisor(supervisor: Supervisor) {
+        dao.insertSupervisor(supervisor)
+    }
+
+    suspend fun updateSupervisor(supervisor: Supervisor) {
+        dao.updateSupervisor(supervisor)
+    }
+
+    suspend fun deleteSupervisor(supervisor: Supervisor) {
+        dao.deleteSupervisor(supervisor)
+    }
 }
+
