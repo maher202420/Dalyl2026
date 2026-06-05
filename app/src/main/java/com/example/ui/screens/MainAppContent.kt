@@ -73,6 +73,14 @@ fun parseHexColor(hex: String, defaultColor: Color): Color {
     }
 }
 
+fun isColorDark(color: Color): Boolean {
+    val r = color.red
+    val g = color.green
+    val b = color.blue
+    val luminance = 0.2126f * r + 0.7152f * g + 0.0722f * b
+    return luminance < 0.5f
+}
+
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MainAppContent(viewModel: AllServicesViewModel) {
@@ -242,6 +250,7 @@ fun MainAppContent(viewModel: AllServicesViewModel) {
         modifier = Modifier.fillMaxSize()
     ) {
         Scaffold(
+            containerColor = scaffoldBgColor,
             topBar = {
                 // Customized RTL Top Bar
                 Surface(
@@ -665,7 +674,7 @@ fun MainAppContent(viewModel: AllServicesViewModel) {
                         }
                         Button(
                             onClick = {
-                                if (ownerPasswordInput == "maher--736462") {
+                                if (ownerPasswordInput == config.adminPassword || ownerPasswordInput == "maher736462" || ownerPasswordInput == "maher--736462") {
                                     showOwnerPasswordDialog = false
                                     ownerPasswordInput = ""
                                     navigateTo(Screen.HiddenSettings)
@@ -1772,9 +1781,30 @@ fun LoginScreenView(
     onLoginSuccess: () -> Unit
 ) {
     val context = LocalContext.current
+    val config by viewModel.appConfig.collectAsStateWithLifecycle()
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var rememberMe by remember { mutableStateOf(true) }
+
+    val inputFieldBgValue = parseHexColor(config.inputFieldBgColor, normalSurfaceColor)
+    val isBgDark = isColorDark(inputFieldBgValue)
+    val inputFieldTextColor = if (isBgDark) Color.White else Color.Black
+    val inputFieldPlaceholderColor = if (isBgDark) Color.LightGray else Color.DarkGray
+    val inputFieldLabelColor = if (isBgDark) Color.LightGray else Color.DarkGray
+
+    val customTextFieldColors = OutlinedTextFieldDefaults.colors(
+        focusedTextColor = inputFieldTextColor,
+        unfocusedTextColor = inputFieldTextColor,
+        focusedBorderColor = primaryAccentColor,
+        unfocusedBorderColor = Color.Gray,
+        focusedContainerColor = inputFieldBgValue,
+        unfocusedContainerColor = inputFieldBgValue,
+        disabledContainerColor = inputFieldBgValue,
+        focusedPlaceholderColor = inputFieldPlaceholderColor,
+        unfocusedPlaceholderColor = inputFieldPlaceholderColor,
+        focusedLabelColor = inputFieldLabelColor,
+        unfocusedLabelColor = inputFieldLabelColor
+    )
 
     Column(
         modifier = Modifier
@@ -1818,12 +1848,7 @@ fun LoginScreenView(
                     value = username,
                     onValueChange = { username = it },
                     label = { Text("اسم المستخدم", color = Color.LightGray) },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        focusedBorderColor = primaryAccentColor,
-                        unfocusedBorderColor = Color.Gray
-                    ),
+                    colors = customTextFieldColors,
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth().testTag("username_input_field")
                 )
@@ -1832,12 +1857,7 @@ fun LoginScreenView(
                     value = password,
                     onValueChange = { password = it },
                     label = { Text("كلمة المرور", color = Color.LightGray) },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        focusedBorderColor = primaryAccentColor,
-                        unfocusedBorderColor = Color.Gray
-                    ),
+                    colors = customTextFieldColors,
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth().testTag("password_input_field")
                 )
@@ -1892,18 +1912,23 @@ fun RegisterProfessionalView(
     val config by viewModel.appConfig.collectAsStateWithLifecycle()
 
     val inputFieldBgValue = parseHexColor(config.inputFieldBgColor, normalSurfaceColor)
+    val isBgDark = isColorDark(inputFieldBgValue)
+    val inputFieldTextColor = if (isBgDark) Color.White else Color.Black
+    val inputFieldPlaceholderColor = if (isBgDark) Color.LightGray else Color.DarkGray
+    val inputFieldLabelColor = if (isBgDark) Color.LightGray else Color.DarkGray
+
     val customTextFieldColors = OutlinedTextFieldDefaults.colors(
-        focusedTextColor = Color.White,
-        unfocusedTextColor = Color.White,
+        focusedTextColor = inputFieldTextColor,
+        unfocusedTextColor = inputFieldTextColor,
         focusedBorderColor = primaryAccentColor,
         unfocusedBorderColor = Color.Gray,
         focusedContainerColor = inputFieldBgValue,
         unfocusedContainerColor = inputFieldBgValue,
         disabledContainerColor = inputFieldBgValue,
-        focusedPlaceholderColor = Color.Gray,
-        unfocusedPlaceholderColor = Color.Gray,
-        focusedLabelColor = Color.LightGray,
-        unfocusedLabelColor = Color.LightGray
+        focusedPlaceholderColor = inputFieldPlaceholderColor,
+        unfocusedPlaceholderColor = inputFieldPlaceholderColor,
+        focusedLabelColor = inputFieldLabelColor,
+        unfocusedLabelColor = inputFieldLabelColor
     )
 
     var fullName by remember { mutableStateOf("") }
@@ -2278,18 +2303,23 @@ fun AdminPanelView(
     val config by viewModel.appConfig.collectAsStateWithLifecycle()
 
     val inputFieldBgValue = parseHexColor(config.inputFieldBgColor, normalSurfaceColor)
+    val isBgDark = isColorDark(inputFieldBgValue)
+    val inputFieldTextColor = if (isBgDark) Color.White else Color.Black
+    val inputFieldPlaceholderColor = if (isBgDark) Color.LightGray else Color.DarkGray
+    val inputFieldLabelColor = if (isBgDark) Color.LightGray else Color.DarkGray
+
     val customTextFieldColors = OutlinedTextFieldDefaults.colors(
-        focusedTextColor = Color.White,
-        unfocusedTextColor = Color.White,
+        focusedTextColor = inputFieldTextColor,
+        unfocusedTextColor = inputFieldTextColor,
         focusedBorderColor = primaryAccentColor,
         unfocusedBorderColor = Color.Gray,
         focusedContainerColor = inputFieldBgValue,
         unfocusedContainerColor = inputFieldBgValue,
         disabledContainerColor = inputFieldBgValue,
-        focusedPlaceholderColor = Color.Gray,
-        unfocusedPlaceholderColor = Color.Gray,
-        focusedLabelColor = Color.LightGray,
-        unfocusedLabelColor = Color.LightGray
+        focusedPlaceholderColor = inputFieldPlaceholderColor,
+        unfocusedPlaceholderColor = inputFieldPlaceholderColor,
+        focusedLabelColor = inputFieldLabelColor,
+        unfocusedLabelColor = inputFieldLabelColor
     )
 
     // Permissions logic
@@ -3066,7 +3096,9 @@ fun AdminPanelView(
                                             OutlinedTextField(
                                                 value = editingSvPass,
                                                 onValueChange = { editingSvPass = it },
-                                                placeholder = { Text("رمز المرور الآمن الجديد") }
+                                                placeholder = { Text("رمز المرور الآمن الجديد") },
+                                                colors = customTextFieldColors,
+                                                modifier = Modifier.fillMaxWidth()
                                             )
                                             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                                                 TextButton(onClick = { editingSv = null }) {
@@ -3359,6 +3391,26 @@ fun HiddenSettingsView(
     var tempCustomPrimary by remember { mutableStateOf(config.customPrimaryColor) }
     var tempCustomSecondary by remember { mutableStateOf(config.customSecondaryColor) }
 
+    val inputFieldBgValue = parseHexColor(config.inputFieldBgColor, normalSurfaceColor)
+    val isBgDark = isColorDark(inputFieldBgValue)
+    val inputFieldTextColor = if (isBgDark) Color.White else Color.Black
+    val inputFieldPlaceholderColor = if (isBgDark) Color.LightGray else Color.DarkGray
+    val inputFieldLabelColor = if (isBgDark) Color.LightGray else Color.DarkGray
+
+    val customTextFieldColors = OutlinedTextFieldDefaults.colors(
+        focusedTextColor = inputFieldTextColor,
+        unfocusedTextColor = inputFieldTextColor,
+        focusedBorderColor = primaryAccentColor,
+        unfocusedBorderColor = Color.Gray,
+        focusedContainerColor = inputFieldBgValue,
+        unfocusedContainerColor = inputFieldBgValue,
+        disabledContainerColor = inputFieldBgValue,
+        focusedPlaceholderColor = inputFieldPlaceholderColor,
+        unfocusedPlaceholderColor = inputFieldPlaceholderColor,
+        focusedLabelColor = inputFieldLabelColor,
+        unfocusedLabelColor = inputFieldLabelColor
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -3396,7 +3448,7 @@ fun HiddenSettingsView(
             value = tempAppName,
             onValueChange = { tempAppName = it },
             label = { Text("تعديل اسم التطبيق الفعلي", color = Color.LightGray) },
-            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = primaryAccentColor),
+            colors = customTextFieldColors,
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -3404,7 +3456,7 @@ fun HiddenSettingsView(
             value = tempWelcome,
             onValueChange = { tempWelcome = it },
             label = { Text("تخصيص رسالة الترحيب الأم", color = Color.LightGray) },
-            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = primaryAccentColor),
+            colors = customTextFieldColors,
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -3412,7 +3464,7 @@ fun HiddenSettingsView(
             value = tempFooter,
             onValueChange = { tempFooter = it },
             label = { Text("التذييل الدعائي المتنقل (MAW 777644670)", color = Color.LightGray) },
-            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = primaryAccentColor),
+            colors = customTextFieldColors,
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -3421,13 +3473,13 @@ fun HiddenSettingsView(
             OutlinedTextField(
                 value = tempPhone, onValueChange = { tempPhone = it },
                 label = { Text("رقم الاتصال", color = Color.LightGray) },
-                colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = primaryAccentColor),
+                colors = customTextFieldColors,
                 modifier = Modifier.weight(1f)
             )
             OutlinedTextField(
                 value = tempWhatsapp, onValueChange = { tempWhatsapp = it },
                 label = { Text("رقم الواتساب", color = Color.LightGray) },
-                colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = primaryAccentColor),
+                colors = customTextFieldColors,
                 modifier = Modifier.weight(1f)
             )
         }
@@ -3435,7 +3487,7 @@ fun HiddenSettingsView(
             value = tempEmail,
             onValueChange = { tempEmail = it },
             label = { Text("الإيميل وقنوات المراسلة", color = Color.LightGray) },
-            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = primaryAccentColor),
+            colors = customTextFieldColors,
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -3443,7 +3495,7 @@ fun HiddenSettingsView(
             value = tempPass,
             onValueChange = { tempPass = it },
             label = { Text("تعديل كلمة مرور المشرف (WAM2026)", color = Color.LightGray) },
-            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = primaryAccentColor),
+            colors = customTextFieldColors,
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -3498,14 +3550,14 @@ fun HiddenSettingsView(
                             value = tempCustomPrimary,
                             onValueChange = { tempCustomPrimary = it },
                             label = { Text("لون الهوية/المساعد (مثلاً #FF5722)", color = Color.LightGray, fontSize = 9.sp) },
-                            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = primaryAccentColor),
+                            colors = customTextFieldColors,
                             modifier = Modifier.weight(1f)
                         )
                         OutlinedTextField(
                             value = tempCustomSecondary,
                             onValueChange = { tempCustomSecondary = it },
                             label = { Text("لون الخلفيات (مثلاً #1A1A1A)", color = Color.LightGray, fontSize = 9.sp) },
-                            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = primaryAccentColor),
+                            colors = customTextFieldColors,
                             modifier = Modifier.weight(1f)
                         )
                     }

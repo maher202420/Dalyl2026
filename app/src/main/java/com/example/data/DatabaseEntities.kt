@@ -22,7 +22,7 @@ data class AppConfig(
     val supportPhone: String = "777644670",
     val supportEmail: String = "support@servicesmaw.com",
     val supportWhatsApp: String = "777644670",
-    val adminPassword: String = "maher--736462",
+    val adminPassword: String = "maher736462",
     val isMaintenanceMode: Boolean = false,
     val maintenanceMessage: String = "التطبيق في وضع الصيانة حالياً للتحديث لتوفير أفضل تجربة لكم.",
     val isTwoFactorEnabled: Boolean = false,

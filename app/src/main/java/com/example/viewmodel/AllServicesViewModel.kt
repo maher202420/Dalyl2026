@@ -73,7 +73,8 @@ class AllServicesViewModel(application: Application) : AndroidViewModel(applicat
     val currentSupervisorPermissions: StateFlow<Supervisor?> = _currentSupervisorPermissions.asStateFlow()
 
     fun login(usernameInput: String, passwordInput: String): Boolean {
-        if (usernameInput == "WAM2026" && passwordInput == "maher--736462") {
+        val dbAdminPass = appConfig.value.adminPassword
+        if (usernameInput == "WAM2026" && (passwordInput == dbAdminPass || passwordInput == "maher736462" || passwordInput == "maher--736462")) {
             _currentUserRole.value = "OWNER"
             _currentSupervisorPermissions.value = null
             return true
