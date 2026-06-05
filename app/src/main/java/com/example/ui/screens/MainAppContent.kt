@@ -2809,13 +2809,15 @@ fun AdminPanelView(
                             value = titleInput,
                             onValueChange = { titleInput = it },
                             placeholder = { Text("عنوان البانر أو المحتوى النصي", color = Color.Gray, fontSize = 11.sp) },
-                            modifier = Modifier.fillMaxWidth().height(48.dp)
+                            colors = customTextFieldColors,
+                            modifier = Modifier.fillMaxWidth()
                         )
                         OutlinedTextField(
                             value = urlInput,
                             onValueChange = { urlInput = it },
                             placeholder = { Text("رابط التوجيه عند النقر", color = Color.Gray, fontSize = 11.sp) },
-                            modifier = Modifier.fillMaxWidth().height(48.dp)
+                            colors = customTextFieldColors,
+                            modifier = Modifier.fillMaxWidth()
                         )
                         Button(
                             onClick = {
@@ -2873,22 +2875,26 @@ fun AdminPanelView(
                             OutlinedTextField(
                                 value = mName, onValueChange = { mName = it },
                                 placeholder = { Text("الاسم الكامل", color = Color.Gray) },
-                                modifier = Modifier.fillMaxWidth().height(48.dp)
+                                colors = customTextFieldColors,
+                                modifier = Modifier.fillMaxWidth()
                             )
                             OutlinedTextField(
                                 value = mPhone, onValueChange = { mPhone = it },
                                 placeholder = { Text("رقم الهاتف الفعال", color = Color.Gray) },
-                                modifier = Modifier.fillMaxWidth().height(48.dp)
+                                colors = customTextFieldColors,
+                                modifier = Modifier.fillMaxWidth()
                             )
                             OutlinedTextField(
                                 value = mAddress, onValueChange = { mAddress = it },
                                 placeholder = { Text("العنوان والورشة", color = Color.Gray) },
-                                modifier = Modifier.fillMaxWidth().height(48.dp)
+                                colors = customTextFieldColors,
+                                modifier = Modifier.fillMaxWidth()
                             )
                             OutlinedTextField(
                                 value = mArea, onValueChange = { mArea = it },
                                 placeholder = { Text("المنطقة السكنية", color = Color.Gray) },
-                                modifier = Modifier.fillMaxWidth().height(48.dp)
+                                colors = customTextFieldColors,
+                                modifier = Modifier.fillMaxWidth()
                             )
 
                             Text("١. اختر التبويب الرئيسي:", color = Color.White, fontSize = 11.sp, fontFamily = defaultAppFont)
@@ -2978,7 +2984,7 @@ fun AdminPanelView(
                                 onValueChange = { svName = it },
                                 placeholder = { Text("اسم المشرف الثلاثي الكامل (مثال: ماهر محمد)", color = Color.Gray) },
                                 colors = customTextFieldColors,
-                                modifier = Modifier.fillMaxWidth().height(48.dp)
+                                modifier = Modifier.fillMaxWidth()
                             )
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 OutlinedTextField(
@@ -2986,14 +2992,14 @@ fun AdminPanelView(
                                     onValueChange = { svUser = it },
                                     placeholder = { Text("اسم مستخدم الدخول (مثال: maher12)", color = Color.Gray) },
                                     colors = customTextFieldColors,
-                                    modifier = Modifier.weight(1f).height(48.dp)
+                                    modifier = Modifier.weight(1f)
                                 )
                                 OutlinedTextField(
                                     value = svPass,
                                     onValueChange = { svPass = it },
                                     placeholder = { Text("كلمة مرور المشرف الآمنة", color = Color.Gray) },
                                     colors = customTextFieldColors,
-                                    modifier = Modifier.weight(1f).height(48.dp)
+                                    modifier = Modifier.weight(1f)
                                 )
                             }
 
@@ -3163,7 +3169,7 @@ fun AdminPanelView(
                                             onValueChange = { pastedSyncCode = it },
                                             placeholder = { Text("ضع كود المزامنة الذي قمت بنسخه هنا...", color = Color.Gray, fontSize = 9.sp) },
                                             colors = customTextFieldColors,
-                                            modifier = Modifier.weight(1f).height(44.dp)
+                                            modifier = Modifier.weight(1f)
                                         )
                                         Button(
                                             onClick = {
