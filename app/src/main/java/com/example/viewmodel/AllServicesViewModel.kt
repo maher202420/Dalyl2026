@@ -483,6 +483,67 @@ class AllServicesViewModel(application: Application) : AndroidViewModel(applicat
         }
     }
 
+    fun exportSupervisorsToCode(): String {
+        val list = supervisors.value
+        val sb = java.lang.StringBuilder()
+        list.forEach { sv ->
+            sb.append("${sv.username}|${sv.name}|${sv.password}|${sv.canAcceptRejectRequests}|${sv.canManageCategories}|${sv.canManageProviders}|${sv.canViewReports}\n")
+        }
+        return try {
+            android.util.Base64.encodeToString(sb.toString().toByteArray(Charsets.UTF_8), android.util.Base64.NO_WRAP)
+        } catch (e: Exception) {
+            ""
+        }
+    }
+
+    fun importSupervisorsFromCode(code: String): Boolean {
+        return try {
+            val decrypted = String(android.util.Base64.decode(code, android.util.Base64.DEFAULT), Charsets.UTF_8)
+            val lines = decrypted.split("\n")
+            viewModelScope.launch(Dispatchers.IO) {
+                lines.forEach { line ->
+                    if (line.isNotBlank()) {
+                        val parts = line.split("|")
+                        if (parts.size >= 7) {
+                            val usernameInput = parts[0]
+                            val nameInput = parts[1]
+                            val passwordInput = parts[2]
+                            val canAcceptReject = parts[3].toBoolean()
+                            val canManageCat = parts[4].toBoolean()
+                            val canManageProv = parts[5].toBoolean()
+                            val canViewRep = parts[6].toBoolean()
+
+                            val existing = supervisors.value.firstOrNull { it.username == usernameInput }
+                            if (existing != null) {
+                                repository.updateSupervisor(existing.copy(
+                                    name = nameInput,
+                                    password = passwordInput,
+                                    canAcceptRejectRequests = canAcceptReject,
+                                    canManageCategories = canManageCat,
+                                    canManageProviders = canManageProv,
+                                    canViewReports = canViewRep
+                                ))
+                            } else {
+                                repository.insertSupervisor(Supervisor(
+                                    username = usernameInput,
+                                    name = nameInput,
+                                    password = passwordInput,
+                                    canAcceptRejectRequests = canAcceptReject,
+                                    canManageCategories = canManageCat,
+                                    canManageProviders = canManageProv,
+                                    canViewReports = canViewRep
+                                ))
+                            }
+                        }
+                    }
+                }
+            }
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     // --- Custom Welcome Customization Options ---
     fun updateWelcomeImage(imageUri: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -641,6 +702,14 @@ class AllServicesViewModel(application: Application) : AndroidViewModel(applicat
             val config = appConfig.value.copy(adminPassword = newPass)
             repository.updateAppConfig(config)
             repository.logActivity("المالك", "تم تغيير كلمة مرور المدير العام.")
+        }
+    }
+
+    fun updateInputFieldBgColor(hexColor: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val config = appConfig.value.copy(inputFieldBgColor = hexColor)
+            repository.updateAppConfig(config)
+            repository.logActivity("المالك", "تم تحديث خلفية حقول الكتابة إلى: $hexColor")
         }
     }
 

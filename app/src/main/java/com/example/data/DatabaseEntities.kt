@@ -37,7 +37,8 @@ data class AppConfig(
     val chatSize: Int = 48,
     val dataSavingMode: Boolean = false,
     val topBarIconsOrder: String = "HOME,LOGIN,REGISTER,LANG,REFRESH", // Order in CSV
-    val fcmChannelsEnabled: String = "JOIN_REQUESTS:true,REPORTS:true,SUBSCRIPTIONS:true"
+    val fcmChannelsEnabled: String = "JOIN_REQUESTS:true,REPORTS:true,SUBSCRIPTIONS:true",
+    val inputFieldBgColor: String = "#1E293B"
 )
 
 @Entity(tableName = "categories")

@@ -57,6 +57,22 @@ enum class Screen {
     UserHistory
 }
 
+fun parseHexColor(hex: String, defaultColor: Color): Color {
+    if (hex.isBlank()) return defaultColor
+    return try {
+        val trimmed = hex.trim().removePrefix("#")
+        if (trimmed.length == 6) {
+            Color(android.graphics.Color.parseColor("#$trimmed"))
+        } else if (trimmed.length == 8) {
+            Color(android.graphics.Color.parseColor("#$trimmed"))
+        } else {
+            defaultColor
+        }
+    } catch (e: Exception) {
+        defaultColor
+    }
+}
+
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MainAppContent(viewModel: AllServicesViewModel) {
@@ -123,23 +139,6 @@ fun MainAppContent(viewModel: AllServicesViewModel) {
             currentScreen = screenHistory.last()
         } else {
             currentScreen = Screen.Home
-        }
-    }
-
-    // Dynamic Theme Customizer
-    fun parseHexColor(hex: String, defaultColor: Color): Color {
-        if (hex.isBlank()) return defaultColor
-        return try {
-            val trimmed = hex.trim().removePrefix("#")
-            if (trimmed.length == 6) {
-                Color(android.graphics.Color.parseColor("#$trimmed"))
-            } else if (trimmed.length == 8) {
-                Color(android.graphics.Color.parseColor("#$trimmed"))
-            } else {
-                defaultColor
-            }
-        } catch (e: Exception) {
-            defaultColor
         }
     }
 
@@ -1890,6 +1889,22 @@ fun RegisterProfessionalView(
     val context = LocalContext.current
     val categories by viewModel.categories.collectAsStateWithLifecycle()
     val mainCategories = categories.filter { it.parentId == null }
+    val config by viewModel.appConfig.collectAsStateWithLifecycle()
+
+    val inputFieldBgValue = parseHexColor(config.inputFieldBgColor, normalSurfaceColor)
+    val customTextFieldColors = OutlinedTextFieldDefaults.colors(
+        focusedTextColor = Color.White,
+        unfocusedTextColor = Color.White,
+        focusedBorderColor = primaryAccentColor,
+        unfocusedBorderColor = Color.Gray,
+        focusedContainerColor = inputFieldBgValue,
+        unfocusedContainerColor = inputFieldBgValue,
+        disabledContainerColor = inputFieldBgValue,
+        focusedPlaceholderColor = Color.Gray,
+        unfocusedPlaceholderColor = Color.Gray,
+        focusedLabelColor = Color.LightGray,
+        unfocusedLabelColor = Color.LightGray
+    )
 
     var fullName by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
@@ -1935,10 +1950,7 @@ fun RegisterProfessionalView(
             value = fullName,
             onValueChange = { fullName = it },
             label = { Text("الاسم الثلاثي الكامل (إجباري)", color = Color.LightGray) },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.White, unfocusedTextColor = Color.White,
-                focusedBorderColor = primaryAccentColor, unfocusedBorderColor = Color.Gray
-            ),
+            colors = customTextFieldColors,
             singleLine = true,
             modifier = Modifier.fillMaxWidth().testTag("register_fullname")
         )
@@ -1947,10 +1959,7 @@ fun RegisterProfessionalView(
             value = phone,
             onValueChange = { phone = it },
             label = { Text("رقم الهاتف الفعال / واتساب (إجباري)", color = Color.LightGray) },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.White, unfocusedTextColor = Color.White,
-                focusedBorderColor = primaryAccentColor, unfocusedBorderColor = Color.Gray
-            ),
+            colors = customTextFieldColors,
             singleLine = true,
             modifier = Modifier.fillMaxWidth().testTag("register_phone")
         )
@@ -2022,10 +2031,7 @@ fun RegisterProfessionalView(
             value = address,
             onValueChange = { address = it },
             label = { Text("مكان وعنوان مركز/مكتب العمل الحالي (إجباري)", color = Color.LightGray) },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.White, unfocusedTextColor = Color.White,
-                focusedBorderColor = primaryAccentColor, unfocusedBorderColor = Color.Gray
-            ),
+            colors = customTextFieldColors,
             modifier = Modifier.fillMaxWidth().testTag("register_address")
         )
 
@@ -2033,10 +2039,7 @@ fun RegisterProfessionalView(
             value = area,
             onValueChange = { area = it },
             label = { Text("منطقة الدائرة السكنية الحالية (إجباري)", color = Color.LightGray) },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.White, unfocusedTextColor = Color.White,
-                focusedBorderColor = primaryAccentColor, unfocusedBorderColor = Color.Gray
-            ),
+            colors = customTextFieldColors,
             singleLine = true,
             modifier = Modifier.fillMaxWidth().testTag("register_area")
         )
@@ -2050,10 +2053,7 @@ fun RegisterProfessionalView(
                 value = gpsCoordinates,
                 onValueChange = { gpsCoordinates = it },
                 label = { Text("إحداثيات وموقع الخريطة GPS (اختياري)", color = Color.LightGray) },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = Color.White, unfocusedTextColor = Color.White,
-                    focusedBorderColor = primaryAccentColor, unfocusedBorderColor = Color.Gray
-                ),
+                colors = customTextFieldColors,
                 singleLine = true,
                 modifier = Modifier.weight(1f).testTag("register_gps")
             )
@@ -2276,6 +2276,21 @@ fun AdminPanelView(
     val currentUserRole by viewModel.currentUserRole.collectAsStateWithLifecycle()
     val activeSupervisor by viewModel.currentSupervisorPermissions.collectAsStateWithLifecycle()
     val config by viewModel.appConfig.collectAsStateWithLifecycle()
+
+    val inputFieldBgValue = parseHexColor(config.inputFieldBgColor, normalSurfaceColor)
+    val customTextFieldColors = OutlinedTextFieldDefaults.colors(
+        focusedTextColor = Color.White,
+        unfocusedTextColor = Color.White,
+        focusedBorderColor = primaryAccentColor,
+        unfocusedBorderColor = Color.Gray,
+        focusedContainerColor = inputFieldBgValue,
+        unfocusedContainerColor = inputFieldBgValue,
+        disabledContainerColor = inputFieldBgValue,
+        focusedPlaceholderColor = Color.Gray,
+        unfocusedPlaceholderColor = Color.Gray,
+        focusedLabelColor = Color.LightGray,
+        unfocusedLabelColor = Color.LightGray
+    )
 
     // Permissions logic
     val canAcceptReject = if (currentUserRole == "OWNER") true else (activeSupervisor?.canAcceptRejectRequests == true)
@@ -2595,19 +2610,22 @@ fun AdminPanelView(
                                     value = nameArInput,
                                     onValueChange = { nameArInput = it },
                                     placeholder = { Text("الاسم بالعربية (إجباري)", color = Color.Gray, fontSize = 11.sp) },
+                                    colors = customTextFieldColors,
                                     modifier = Modifier.weight(1f)
                                 )
                                 OutlinedTextField(
                                     value = nameEnInput,
                                     onValueChange = { nameEnInput = it },
                                     placeholder = { Text("الاسم بالإنجليزية (إجباري)", color = Color.Gray, fontSize = 11.sp) },
+                                    colors = customTextFieldColors,
                                     modifier = Modifier.weight(1f)
                                 )
                             }
                             OutlinedTextField(
                                 value = imageSourceInput,
-                                  onValueChange = { imageSourceInput = it },
+                                onValueChange = { imageSourceInput = it },
                                 placeholder = { Text("رابط أو مسار صورة القسم (اختياري - WebP, PNG)", color = Color.Gray, fontSize = 11.sp) },
+                                colors = customTextFieldColors,
                                 modifier = Modifier.fillMaxWidth()
                             )
                             Button(
@@ -2929,6 +2947,7 @@ fun AdminPanelView(
                                 value = svName,
                                 onValueChange = { svName = it },
                                 placeholder = { Text("اسم المشرف الثلاثي الكامل (مثال: ماهر محمد)", color = Color.Gray) },
+                                colors = customTextFieldColors,
                                 modifier = Modifier.fillMaxWidth().height(48.dp)
                             )
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -2936,12 +2955,14 @@ fun AdminPanelView(
                                     value = svUser,
                                     onValueChange = { svUser = it },
                                     placeholder = { Text("اسم مستخدم الدخول (مثال: maher12)", color = Color.Gray) },
+                                    colors = customTextFieldColors,
                                     modifier = Modifier.weight(1f).height(48.dp)
                                 )
                                 OutlinedTextField(
                                     value = svPass,
                                     onValueChange = { svPass = it },
                                     placeholder = { Text("كلمة مرور المشرف الآمنة", color = Color.Gray) },
+                                    colors = customTextFieldColors,
                                     modifier = Modifier.weight(1f).height(48.dp)
                                 )
                             }
@@ -3068,6 +3089,71 @@ fun AdminPanelView(
                                     }
                                 }
                             }
+
+                            Divider(color = Color.DarkGray, modifier = Modifier.padding(vertical = 10.dp))
+
+                            Card(
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+                                colors = CardDefaults.cardColors(containerColor = normalSurfaceColor.copy(alpha = 0.5f)),
+                                border = BorderStroke(1.dp, primaryAccentColor.copy(alpha = 0.4f))
+                            ) {
+                                Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    Text("🔄 مزامنة المشرفين المشتركة بين كل الأجهزة:", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold, fontFamily = defaultAppFont)
+                                    Text("تتيح لك هذه الميزة تصدير أو استيراد المشرفين وصلاحياتهم بضغطة زر لمزامنتها مع بقية هواتف الإدارة والمشرفين فوراً بشكل مشفر.", color = Color.LightGray, fontSize = 10.sp, fontFamily = defaultAppFont)
+                                    
+                                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                                        Button(
+                                            onClick = {
+                                                val syncCode = viewModel.exportSupervisorsToCode()
+                                                if (syncCode.isNotBlank()) {
+                                                    val clipboardManager = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                                                    val clipData = android.content.ClipData.newPlainText("SupervisorsSyncCode", syncCode)
+                                                    clipboardManager.setPrimaryClip(clipData)
+                                                    Toast.makeText(context, "📋 تم توليد ونسخ كود المزامنة المشفر للحافظة! شاركه مع بقية الأجهزة الآن.", Toast.LENGTH_LONG).show()
+                                                } else {
+                                                    Toast.makeText(context, "لا يوجد مشرفين حالياً لتصديرهم!", Toast.LENGTH_SHORT).show()
+                                                }
+                                            },
+                                            colors = ButtonDefaults.buttonColors(containerColor = primaryAccentColor),
+                                            modifier = Modifier.weight(1f)
+                                        ) {
+                                            Text("تصدير كود المزامنة 📤", color = Color.Black, fontSize = 10.sp, fontWeight = FontWeight.Bold, fontFamily = defaultAppFont)
+                                        }
+                                    }
+
+                                    Divider(color = Color.DarkGray, modifier = Modifier.padding(vertical = 4.dp))
+                                    Text("📥 استيراد ومزامنة كود المشرفين من جهاز آخر:", color = Color.LightGray, fontSize = 10.sp, fontFamily = defaultAppFont)
+                                    
+                                    var pastedSyncCode by remember { mutableStateOf("") }
+                                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        OutlinedTextField(
+                                            value = pastedSyncCode,
+                                            onValueChange = { pastedSyncCode = it },
+                                            placeholder = { Text("ضع كود المزامنة الذي قمت بنسخه هنا...", color = Color.Gray, fontSize = 9.sp) },
+                                            colors = customTextFieldColors,
+                                            modifier = Modifier.weight(1f).height(44.dp)
+                                        )
+                                        Button(
+                                            onClick = {
+                                                if (pastedSyncCode.isBlank()) {
+                                                    Toast.makeText(context, "الرجاء لصق كود المزامنة أولاً!", Toast.LENGTH_SHORT).show()
+                                                } else {
+                                                    val success = viewModel.importSupervisorsFromCode(pastedSyncCode)
+                                                    if (success) {
+                                                        Toast.makeText(context, "✔️ تمت مزامنة واستيراد المشرفين على هذا الجهاز بنجاح فوري!", Toast.LENGTH_LONG).show()
+                                                        pastedSyncCode = ""
+                                                    } else {
+                                                        Toast.makeText(context, "❌ كود المزامنة الملصق غير صالح أو تالف! يرجى التأكد وإعادة المحاولة.", Toast.LENGTH_LONG).show()
+                                                    }
+                                                }
+                                            },
+                                            colors = ButtonDefaults.buttonColors(containerColor = primaryAccentColor)
+                                        ) {
+                                            Text("مزامنة 🔄", color = Color.Black, fontSize = 10.sp)
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -3134,6 +3220,7 @@ fun AdminPanelView(
                             OutlinedTextField(
                                 value = welcomeText,
                                 onValueChange = { welcomeText = it },
+                                colors = customTextFieldColors,
                                 modifier = Modifier.fillMaxWidth().height(80.dp)
                             )
                             Button(
@@ -3184,6 +3271,56 @@ fun AdminPanelView(
                                     ) {
                                         Text(name, fontSize = 9.sp, color = if (isSel) Color.Black else Color.White, textAlign = TextAlign.Center, fontFamily = defaultAppFont)
                                     }
+                                }
+                            }
+
+                            Divider(color = Color.DarkGray)
+
+                            Text("٥. تعديل خلفية حقول الكتابة والنص لتلافي مشاكل العرض:", color = Color.LightGray, fontSize = 11.sp, fontFamily = defaultAppFont)
+                            var inputFieldHexInput by remember { mutableStateOf(config.inputFieldBgColor) }
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                OutlinedTextField(
+                                    value = inputFieldHexInput,
+                                    onValueChange = { inputFieldHexInput = it },
+                                    colors = customTextFieldColors,
+                                    placeholder = { Text("كود اللون بالهكس (مثال: #1E293B)", color = Color.Gray, fontSize = 10.sp) },
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Button(
+                                    onClick = {
+                                        if (inputFieldHexInput.isNotBlank()) {
+                                            viewModel.updateInputFieldBgColor(inputFieldHexInput)
+                                            Toast.makeText(context, "تم حفظ وتطبيق خلفية حقول الكتابة الجديدة في المنصة!", Toast.LENGTH_SHORT).show()
+                                        }
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = primaryAccentColor)
+                                ) {
+                                    Text("تطبيق 🎨", color = Color.Black, fontSize = 11.sp)
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            Text("٦. رابط / مسار صورة الغلاف لغلاف ترحيب مخصص بدلاً من النص:", color = Color.LightGray, fontSize = 11.sp, fontFamily = defaultAppFont)
+                            var welcomeImgUrlInput by remember { mutableStateOf(config.welcomeImageUri) }
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                OutlinedTextField(
+                                    value = welcomeImgUrlInput,
+                                    onValueChange = { welcomeImgUrlInput = it },
+                                    colors = customTextFieldColors,
+                                    placeholder = { Text("مثال: https://images.unsplash.com/photo-...", color = Color.Gray, fontSize = 10.sp) },
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Button(
+                                    onClick = {
+                                        if (welcomeImgUrlInput.isNotBlank()) {
+                                            viewModel.updateWelcomeImage(welcomeImgUrlInput)
+                                            Toast.makeText(context, "تم حفظ وتحديث صورة الترحيب المخصصة بدلاً من الرسالة النصية!", Toast.LENGTH_SHORT).show()
+                                        }
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = primaryAccentColor)
+                                ) {
+                                    Text("تطبيق 🖼️", color = Color.Black, fontSize = 11.sp)
                                 }
                             }
                         }
