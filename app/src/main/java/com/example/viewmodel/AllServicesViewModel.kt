@@ -592,6 +592,18 @@ class AllServicesViewModel(application: Application) : AndroidViewModel(applicat
         }
     }
 
+    fun updateCustomColors(primaryHex: String, secondaryHex: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val config = appConfig.value.copy(
+                primaryTheme = "CUSTOM",
+                customPrimaryColor = primaryHex,
+                customSecondaryColor = secondaryHex
+            )
+            repository.updateAppConfig(config)
+            repository.logActivity("المالك", "تم حفظ وتطبيق ألوان مخصصة: $primaryHex, $secondaryHex")
+        }
+    }
+
     fun updateAppName(newName: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val config = appConfig.value.copy(appName = newName)

@@ -127,25 +127,51 @@ fun MainAppContent(viewModel: AllServicesViewModel) {
     }
 
     // Dynamic Theme Customizer
-    val isDark = true // App works mostly in a luxurious dark palette as requested
-    val primaryBrush = when (config.primaryTheme) {
-        "COSMIC_SILVER" -> Brush.linearGradient(listOf(Color(0xFFE2E8F0), Color(0xFF94A3B8))) // Silver Slate
-        "GOLDEN" -> Brush.linearGradient(listOf(Color(0xFFFFD700), Color(0xFFB8860B))) // Gold
-        "EMERALD" -> Brush.linearGradient(listOf(Color(0xFF10B981), Color(0xFF047857))) // Emerald
-        else -> Brush.linearGradient(listOf(Color(0xFF3B82F6), Color(0xFF1D4ED8))) // Blueprint
+    fun parseHexColor(hex: String, defaultColor: Color): Color {
+        if (hex.isBlank()) return defaultColor
+        return try {
+            val trimmed = hex.trim().removePrefix("#")
+            if (trimmed.length == 6) {
+                Color(android.graphics.Color.parseColor("#$trimmed"))
+            } else if (trimmed.length == 8) {
+                Color(android.graphics.Color.parseColor("#$trimmed"))
+            } else {
+                defaultColor
+            }
+        } catch (e: Exception) {
+            defaultColor
+        }
     }
 
+    val isDark = true // App works mostly in a luxurious dark palette as requested
+    
     val primaryAccentColor = when (config.primaryTheme) {
         "COSMIC_SILVER" -> Color(0xFF94A3B8)
         "GOLDEN" -> Color(0xFFFFD700)
         "EMERALD" -> Color(0xFF10B981)
+        "BLACK" -> Color(0xFFE2E8F0)
+        "GREEN" -> Color(0xFF22C55E)
+        "CUSTOM" -> parseHexColor(config.customPrimaryColor, Color(0xFF10B981))
         else -> Color(0xFF3B82F6)
+    }
+
+    val primaryBrush = when (config.primaryTheme) {
+        "COSMIC_SILVER" -> Brush.linearGradient(listOf(Color(0xFFE2E8F0), Color(0xFF94A3B8))) // Silver Slate
+        "GOLDEN" -> Brush.linearGradient(listOf(Color(0xFFFFD700), Color(0xFFB8860B))) // Gold
+        "EMERALD" -> Brush.linearGradient(listOf(Color(0xFF10B981), Color(0xFF047857))) // Emerald
+        "BLACK" -> Brush.linearGradient(listOf(Color(0xFF4A4A4A), Color(0xFF1A1A1A))) // Charcoal and black
+        "GREEN" -> Brush.linearGradient(listOf(Color(0xFF22C55E), Color(0xFF15803D))) // Fresh Green
+        "CUSTOM" -> Brush.linearGradient(listOf(primaryAccentColor, primaryAccentColor.copy(alpha = 0.7f)))
+        else -> Brush.linearGradient(listOf(Color(0xFF3B82F6), Color(0xFF1D4ED8))) // Blueprint
     }
 
     val scaffoldBgColor = when (config.primaryTheme) {
         "COSMIC_SILVER" -> Color(0xFF0F172A) // Slate
         "GOLDEN" -> Color(0xFF1C1917) // Coal Stone
         "EMERALD" -> Color(0xFF062F24) // Deep Jade Forest
+        "BLACK" -> Color(0xFF000000) // Pure black
+        "GREEN" -> Color(0xFF022C22) // Emerald/forest background
+        "CUSTOM" -> parseHexColor(config.customSecondaryColor, Color(0xFF062F24))
         else -> Color(0xFF0B0F19)
     }
 
@@ -153,6 +179,18 @@ fun MainAppContent(viewModel: AllServicesViewModel) {
         "COSMIC_SILVER" -> Color(0xFF1E293B)
         "GOLDEN" -> Color(0xFF292524)
         "EMERALD" -> Color(0xFF0A4F3D)
+        "BLACK" -> Color(0xFF121212) // Charcoal dark surface
+        "GREEN" -> Color(0xFF064E3B) // Dark Green surface
+        "CUSTOM" -> {
+            val bg = parseHexColor(config.customSecondaryColor, Color(0xFF062F24))
+            // Slightly lighter custom surface color
+            try {
+                // Return slightly offset background
+                bg
+            } catch(e: Exception) {
+                Color(0xFF1F2937)
+            }
+        }
         else -> Color(0xFF1F2937)
     }
 
@@ -800,7 +838,7 @@ fun MainAppContent(viewModel: AllServicesViewModel) {
                                 unfocusedTextColor = Color.White
                             ),
                             shape = RoundedCornerShape(12.dp),
-                            modifier = Modifier.weight(1f).height(50.dp).testTag("assistant_input")
+                            modifier = Modifier.weight(1f).testTag("assistant_input")
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         IconButton(
@@ -945,7 +983,7 @@ fun MainAppContent(viewModel: AllServicesViewModel) {
                                 unfocusedTextColor = Color.White
                             ),
                             shape = RoundedCornerShape(12.dp),
-                            modifier = Modifier.weight(1f).height(50.dp).testTag("chat_room_text_input")
+                            modifier = Modifier.weight(1f).testTag("chat_room_text_input")
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         IconButton(
@@ -1182,7 +1220,7 @@ fun HomeScreenView(
                             unfocusedBorderColor = Color.Gray
                         ),
                         shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.weight(1f).height(50.dp).testTag("search_input_field")
+                        modifier = Modifier.weight(1f).testTag("search_input_field")
                     )
 
                     Spacer(modifier = Modifier.width(6.dp))
@@ -2557,20 +2595,20 @@ fun AdminPanelView(
                                     value = nameArInput,
                                     onValueChange = { nameArInput = it },
                                     placeholder = { Text("الاسم بالعربية (إجباري)", color = Color.Gray, fontSize = 11.sp) },
-                                    modifier = Modifier.weight(1f).height(48.dp)
+                                    modifier = Modifier.weight(1f)
                                 )
                                 OutlinedTextField(
                                     value = nameEnInput,
                                     onValueChange = { nameEnInput = it },
                                     placeholder = { Text("الاسم بالإنجليزية (إجباري)", color = Color.Gray, fontSize = 11.sp) },
-                                    modifier = Modifier.weight(1f).height(48.dp)
+                                    modifier = Modifier.weight(1f)
                                 )
                             }
                             OutlinedTextField(
                                 value = imageSourceInput,
-                                onValueChange = { imageSourceInput = it },
+                                  onValueChange = { imageSourceInput = it },
                                 placeholder = { Text("رابط أو مسار صورة القسم (اختياري - WebP, PNG)", color = Color.Gray, fontSize = 11.sp) },
-                                modifier = Modifier.fillMaxWidth().height(48.dp)
+                                modifier = Modifier.fillMaxWidth()
                             )
                             Button(
                                 onClick = {
@@ -3181,6 +3219,8 @@ fun HiddenSettingsView(
     var tempFooter by remember { mutableStateOf(config.promotionalFooter) }
     var tempWelcome by remember { mutableStateOf(config.welcomeMessage) }
     var tempPass by remember { mutableStateOf(config.adminPassword) }
+    var tempCustomPrimary by remember { mutableStateOf(config.customPrimaryColor) }
+    var tempCustomSecondary by remember { mutableStateOf(config.customSecondaryColor) }
 
     Column(
         modifier = Modifier
@@ -3245,13 +3285,13 @@ fun HiddenSettingsView(
                 value = tempPhone, onValueChange = { tempPhone = it },
                 label = { Text("رقم الاتصال", color = Color.LightGray) },
                 colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = primaryAccentColor),
-                modifier = Modifier.weight(1f).height(50.dp)
+                modifier = Modifier.weight(1f)
             )
             OutlinedTextField(
                 value = tempWhatsapp, onValueChange = { tempWhatsapp = it },
                 label = { Text("رقم الواتساب", color = Color.LightGray) },
                 colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = primaryAccentColor),
-                modifier = Modifier.weight(1f).height(50.dp)
+                modifier = Modifier.weight(1f)
             )
         }
         OutlinedTextField(
@@ -3273,32 +3313,81 @@ fun HiddenSettingsView(
         // Custom Visual theme choice interface
         Text("تغيير الألوان والهوية البصرية للتطبيق ديناميكياً:", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             val themes = listOf(
-                "EMERALD" to "🟢 الزمردي الراقي",
-                "GOLDEN" to "✨ الذهبي الفاخر",
-                "COSMIC_SILVER" to "🌌 كوزميك سيلفر"
+                "EMERALD" to "🟢 الزمردي",
+                "GOLDEN" to "✨ الذهبي",
+                "COSMIC_SILVER" to "🌌 الفضي",
+                "BLACK" to "🖤 الأسود",
+                "GREEN" to "💚 الأخضر",
+                "CUSTOM" to "🎨 مخصصة"
             )
             themes.forEach { (key, display) ->
                 val isSel = config.primaryTheme == key
                 Box(
                     modifier = Modifier
-                        .weight(1f)
                         .clip(RoundedCornerShape(10.dp))
                         .background(if (isSel) primaryAccentColor else Color.DarkGray)
                         .clickable { viewModel.updateAppColors(key) }
-                        .padding(10.dp)
+                        .padding(horizontal = 14.dp, vertical = 10.dp)
                 ) {
                     Text(
                         display,
                         color = if (isSel) Color.Black else Color.White,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
+                        textAlign = TextAlign.Center
                     )
+                }
+            }
+        }
+
+        // Custom theme settings
+        if (config.primaryTheme == "CUSTOM") {
+            Card(
+                colors = CardDefaults.cardColors(containerColor = normalSurfaceColor),
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text("تعريف تدرج واختيار الألوان المخصصة (Hex) للكود:", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        OutlinedTextField(
+                            value = tempCustomPrimary,
+                            onValueChange = { tempCustomPrimary = it },
+                            label = { Text("لون الهوية/المساعد (مثلاً #FF5722)", color = Color.LightGray, fontSize = 9.sp) },
+                            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = primaryAccentColor),
+                            modifier = Modifier.weight(1f)
+                        )
+                        OutlinedTextField(
+                            value = tempCustomSecondary,
+                            onValueChange = { tempCustomSecondary = it },
+                            label = { Text("لون الخلفيات (مثلاً #1A1A1A)", color = Color.LightGray, fontSize = 9.sp) },
+                            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = primaryAccentColor),
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    
+                    Button(
+                        onClick = {
+                            if (tempCustomPrimary.isNotBlank() && tempCustomSecondary.isNotBlank()) {
+                                viewModel.updateCustomColors(tempCustomPrimary, tempCustomSecondary)
+                                Toast.makeText(context, "تم تطبيق الهوية البصرية المخصصة للمستخدم بنجاح!", Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(context, "الرجاء تعبئة الأكواد (#HEX) بشكل كامل أولاً!", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = primaryAccentColor),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text("حفظ وتنشيط الهوية المخصصة 🎨", color = Color.Black, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                    }
                 }
             }
         }
