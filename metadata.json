@@ -1,0 +1,6 @@
+{
+  "name": "كل الخدمات بين يديك",
+  "description": "تطبيق متكامل يقدم جميع الخدمات المهنية والخدماتية مع لوحة تحكم كاملة للمسؤول والمشرفين ومساعد ذكي للرد التفاعلي الفوري وبوابة خلفية سرية للمالك.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
